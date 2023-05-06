@@ -9,7 +9,8 @@ simulate_outbreak(
   population_size = 100,
   R_values,
   dist_incubation,
-  dist_infectious_period,
+  dist_infectious_period = NULL,
+  dist_generation_time = NULL,
   dist_reporting = NULL
 )
 }
@@ -28,7 +29,13 @@ time interval between infection and onset of symtpoms}
 
 \item{dist_infectious_period}{the distribution of the infectious period,
 i.e. the time interval between the moment a case starts showing symptoms
-(onset) and the moment they infect new secondary cases}
+(onset) and the moment they infect new secondary cases. If specified, leave
+\code{dist_generation_time} to its default (\code{NULL}).}
+
+\item{dist_generation_time}{the distribution of the generation time,
+i.e. the time interval between the moment a primary case is infected
+and the moment they infect new secondary cases. If specified, leave
+\code{dist_infectious_period} to its default (\code{NULL}).}
 
 \item{dist_reporting}{(optional) the distribution of the reporting delay,
 i.e. the time interval between symptom onset and the date at which the case
@@ -38,12 +45,12 @@ is notified; if \code{NULL} (default) reporting dates will not be simulated}
 This function implements an individual-based outbreak simulator which
 generates transmission trees. A Poisson branching process is used to generate
 new cases in time, using the distribution of the reproduction number (R) and
-of the duration of the infectious period to determine rates of infection. A
-density-dependence term is used so that individual infectiousness decreases
-with the proportion of susceptible individuals in the population (see
-details). For each simulated case, the simulator generates an individual
-reproduction number, date of infection, symptom onset, and reporting using
-user-specified distributions. Distributions can be provided either as
+of the duration of the infectious period (or generation time) to determine
+rates of infection. A density-dependence term is used so that individual
+infectiousness decreaseswith the proportion of susceptible individuals in the
+population (see details). For each simulated case, the simulator generates an
+individual reproduction number, date of infection, symptom onset, and reporting
+using user-specified distributions. Distributions can be provided either as
 \code{distcrete} objects, as functions computing the probability mass functions
 (PMF), or as vectors of numbers taken as the PMF for values on 0, 1, ...,
 \code{length(input) - 1}

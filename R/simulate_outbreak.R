@@ -3,12 +3,12 @@
 #' This function implements an individual-based outbreak simulator which
 #' generates transmission trees. A Poisson branching process is used to generate
 #' new cases in time, using the distribution of the reproduction number (R) and
-#' of the duration of the infectious period to determine rates of infection. A
-#' density-dependence term is used so that individual infectiousness decreases
-#' with the proportion of susceptible individuals in the population (see
-#' details). For each simulated case, the simulator generates an individual
-#' reproduction number, date of infection, symptom onset, and reporting using
-#' user-specified distributions. Distributions can be provided either as
+#' of the duration of the infectious period (or generation time) to determine 
+#' rates of infection. A density-dependence term is used so that individual 
+#' infectiousness decreaseswith the proportion of susceptible individuals in the 
+#' population (see details). For each simulated case, the simulator generates an 
+#' individual reproduction number, date of infection, symptom onset, and reporting 
+#' using user-specified distributions. Distributions can be provided either as
 #' `distcrete` objects, as functions computing the probability mass functions
 #' (PMF), or as vectors of numbers taken as the PMF for values on 0, 1, ...,
 #' `length(input) - 1`
@@ -27,8 +27,14 @@
 #'
 #' @param dist_infectious_period the distribution of the infectious period,
 #'   i.e. the time interval between the moment a case starts showing symptoms
-#'   (onset) and the moment they infect new secondary cases
-#'
+#'   (onset) and the moment they infect new secondary cases. If specified, leave
+#'   `dist_generation_time` to its default (`NULL`).
+#'   
+#' @param dist_generation_time the distribution of the generation time,
+#'   i.e. the time interval between the moment a primary case is infected
+#'    and the moment they infect new secondary cases. If specified, leave
+#'   `dist_infectious_period` to its default (`NULL`).
+#'   
 #' @param dist_reporting (optional) the distribution of the reporting delay,
 #'   i.e. the time interval between symptom onset and the date at which the case
 #'   is notified; if `NULL` (default) reporting dates will not be simulated
@@ -70,7 +76,8 @@ simulate_outbreak <- function(duration = 100, # duration of the simulation
                               population_size = 100,
                               R_values, # average secondary cases
                               dist_incubation, # infection -> onset
-                              dist_infectious_period, # onset -> new infections
+                              dist_infectious_period = NULL, # onset -> new infections
+                              dist_generation_time = NULL, # infection -> new infections
                               dist_reporting = NULL  # onset -> reporting
                               ) {
 
@@ -88,12 +95,27 @@ simulate_outbreak <- function(duration = 100, # duration of the simulation
   ## determine if we need to simulate reporting dates
   simulate_reporting <- !is.null(dist_reporting)
   
+  ## determine if we need to simulate with dist_infectious_period or dist_generation_time
+  simulate_infectious_period <- !is.null(dist_infectious_period)
+  simulate_generation_time <- !is.null(dist_generation_time)
+  
+  # check that either dist_infectious_period or dist_generation_time has been specified
+  if ((!simulate_infectious_period && !simulate_generation_time) ||
+      (simulate_infectious_period && simulate_generation_time)) {
+    stop("Either dist_infectious_period or dist_generation_time must be specified")
+  }
+  
   ## make random distribution from inputs, from pmf to random numbers
   x_values <- 0:1000
   pmf_incubation <- make_pmf(dist_incubation)
-  pmf_infectious_period <- make_pmf(dist_infectious_period)
   r_incubation <- make_number_generator(pmf_incubation(x_values))
-  r_infectious_period <- make_number_generator(pmf_infectious_period(x_values))
+  
+  # dist_infectious_period or dist_generation_time PMF
+  if(simulate_infectious_period){
+    pmf_infectious_period <- make_pmf(dist_infectious_period)
+  } else {
+    pmf_generation_time <- make_pmf(dist_generation_time)
+  }
   
   assert_R(R_values)
   r_R <- function(n = 1) sample_(R_values, n, replace = TRUE)
@@ -119,15 +141,19 @@ simulate_outbreak <- function(duration = 100, # duration of the simulation
 
   for (t in seq_len(duration)) {
     
-    ## Individual infectiousness at time 't' is defined as the infectious period
-    ## pmf multiplied by the individual R; the global force of infection is a
-    ## rate defined as the sum of individual infectiousnesses. This rate is
-    ## weighted by the proportion of susceptible individuals in the population
-    ## to introduce density-dependence, the result being used to draw the number
-    ## of secondary cases from a Poisson distribution
+    ## Individual infectiousness at time 't' is defined as the infectious period 
+    ## or generation time pmf multiplied by the individual R; the global force 
+    ## of infection is a rate defined as the sum of individual infectiousnesses. 
+    ## This rate is weighted by the proportion of susceptible individuals in the 
+    ## population to introduce density-dependence, the result being used to draw 
+    ## the number of secondary cases from a Poisson distribution
     
     if (n_susceptibles > 0) {
-      individual_infectiousness <- pmf_infectious_period(t - out$date_onset) * out$R
+      if(simulate_infectious_period){
+        individual_infectiousness <- pmf_infectious_period(t - out$date_onset) * out$R
+      } else{
+        individual_infectiousness <- pmf_generation_time(t - out$date_infection) * out$R
+      }
       rate_infection <- sum(individual_infectiousness) * (n_susceptibles / population_size)
       n_new_cases <- stats::rpois(1, lambda = rate_infection)
       n_new_cases <- min(n_susceptibles, n_new_cases)
