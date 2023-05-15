@@ -138,7 +138,7 @@ simulate_outbreak <- function(duration = 100, # duration of the simulation
 
   ## make vectors for the outputs
   out <- index_case
-
+#browser()
   for (t in seq_len(duration)) {
     
     ## Individual infectiousness at time 't' is defined as the infectious period 
@@ -154,11 +154,12 @@ simulate_outbreak <- function(duration = 100, # duration of the simulation
       } else{
         individual_infectiousness <- pmf_generation_time(t - out$date_infection) * out$R
       }
-      rate_infection <- sum(individual_infectiousness) * (n_susceptibles / population_size)
-      n_new_cases <- stats::rpois(1, lambda = rate_infection)
-      n_new_cases <- min(n_susceptibles, n_new_cases)
-      ## proba_infection <- 1 - exp(-rate_infection)
-      ## n_new_cases <- rbinom(1, size = n_susceptibles, prob = proba_infection)
+      #rate_infection <- sum(individual_infectiousness) * (n_susceptibles / population_size)
+      # n_new_cases <- stats::rpois(1, lambda = rate_infection)
+      # n_new_cases <- min(n_susceptibles, n_new_cases)
+      rate_infection <- sum(individual_infectiousness) / population_size
+      proba_infection <- 1 - exp(-rate_infection)
+      n_new_cases <- rbinom(1, size = n_susceptibles, prob = proba_infection)
     } else {
       n_new_cases <- 0
     }

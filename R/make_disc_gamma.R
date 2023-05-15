@@ -31,7 +31,7 @@ make_disc_gamma <- function(mean, sd) {
   params <- epitrix::gamma_mucv2shapescale(mean, sd / mean)
   distcrete::distcrete("gamma",
                        interval = 1,
-                       w = 0,
+                       w = 1, #was 0
                        shape = params$shape,
                        scale = params$scale)
 }
