@@ -159,7 +159,7 @@ simulate_outbreak <- function(duration = 100, # duration of the simulation
       # n_new_cases <- min(n_susceptibles, n_new_cases)
       rate_infection <- sum(individual_infectiousness) / population_size
       proba_infection <- 1 - exp(-rate_infection)
-      n_new_cases <- rbinom(1, size = n_susceptibles, prob = proba_infection)
+      n_new_cases <- round(n_susceptibles * proba_infection) #deterministic
     } else {
       n_new_cases <- 0
     }
