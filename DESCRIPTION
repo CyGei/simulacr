@@ -1,4 +1,4 @@
-Package: simulacr
+Package: simulacr_deter
 Title: Outbreak simulation using branching processes
 Version: 0.0.1.9000
 Authors@R: person("Thibaut", "Jombart", email = "thibautjombart@gmail.com", role = c("aut", "cre"))
