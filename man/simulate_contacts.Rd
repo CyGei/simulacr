@@ -32,10 +32,10 @@ as exposures or transmissions.
 ## first simulate an outbreak
 ## (see example in ?simulate_outbreak)
 incubation <- c(0, 1, 1, 1, 1) # numbers = unscaled PMF
-infectious_period <- make_disc_gamma(10, 7) # distcrete object
+infectious_period <- make_disc_gamma(5, 1) # distcrete object
 reporting <- function(x) dpois(x, 5) # PMF function
 set.seed(1)
-x <- simulate_outbreak(R = runif(100, 1, 3), # random values on [1;3]
+x <- simulacrDeter::simulate_outbreak(R = runif(100, 1, 3), # random values on [1;3]
                        dist_incubation= incubation,
                        dist_infectious_period = infectious_period,
                        dist_reporting = reporting)
@@ -48,7 +48,7 @@ time_to_contact = c(1, 1, 1)
 ## geom dist for duration of exposure
 duration <- function(x) dgeom(x, prob = .9)
 
-x_with_contacts <- simulate_contacts(
+x_with_contacts <- simulacrDeter::simulate_contacts(
     x[1:10, ],
     n_contacts = 1:10, # 1 to 10 contacts
     dist_time_to_contact = time_to_contact,

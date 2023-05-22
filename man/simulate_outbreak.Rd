@@ -70,7 +70,7 @@ size.
 
 ## make toy distributions (showing the 3 possible input types)
 incubation <- c(0, 1, 1, 1, 1) # numbers = unscaled PMF
-infectious_period <- make_disc_gamma(10, 7) # distcrete object
+infectious_period <- make_disc_gamma(5, 1) # distcrete object
 reporting <- function(x) dpois(x, 5) # PMF function
 set.seed(1)
 x <- simulate_outbreak(R = runif(100, 1, 3), # random values on [1;3]

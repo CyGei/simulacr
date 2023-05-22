@@ -1,4 +1,4 @@
 library(testthat)
-library(simulacr)
+library(simulacrDeter)
 
-test_check("simulacr")
+test_check("simulacrDeter")
