@@ -36,7 +36,7 @@
 #' x <- simulacrDeter::simulate_outbreak(R = runif(100, 1, 3), # random values on [1;3]
 #'                        dist_incubation= incubation,
 #'                        dist_infectious_period = infectious_period,
-#'                        dist_reporting = reporting)
+#'                        dist_reporting = reporting)$data
 #'
 #' ## simulate contacts: inputs
 #'
