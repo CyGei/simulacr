@@ -64,7 +64,7 @@
 #' x <- simulate_outbreak(R = runif(100, 1, 3), # random values on [1;3]
 #'                        dist_incubation= incubation,
 #'                        dist_infectious_period = infectious_period,
-#'                        dist_reporting = reporting)
+#'                        dist_reporting = reporting)$data
 #' dim(x)
 #' head(x)
 #' tail(x)
@@ -138,6 +138,7 @@ simulate_outbreak <- function(duration = 100, # duration of the simulation
 
   ## make vectors for the outputs
   out <- index_case
+  stats <- data.frame()
 #browser()
   for (t in seq_len(duration)) {
     
@@ -209,6 +210,17 @@ simulate_outbreak <- function(duration = 100, # duration of the simulation
                  new_R)
       
     }
+    
+    stats_t <- data.frame(
+      t = t,
+      population_size = population_size, 
+      n_new_cases = n_new_cases,
+      n_susceptibles = n_susceptibles,
+      rate_infection = rate_infection,
+      proba_infection = proba_infection
+    )
+    stats <- rbind(stats, stats_t)
+    
   }
 
 
@@ -220,6 +232,8 @@ simulate_outbreak <- function(duration = 100, # duration of the simulation
   out <- data.frame(out, stringsAsFactors = FALSE)
   class(out) <- c("outbreak", class(out))
   attr(out, "has_contacts") <- FALSE
-  out
+  
+  return(list(data = out,
+              stats = stats))
 }
 
