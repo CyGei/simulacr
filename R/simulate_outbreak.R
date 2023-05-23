@@ -210,12 +210,13 @@ simulate_outbreak <- function(duration = 100, # duration of the simulation
       
     }
     stats_t <- data.frame(
-      t = t,
-      population_size = population_size, 
-      n_new_cases = n_new_cases,
-      n_susceptibles = n_susceptibles,
-      rate_infection = rate_infection,
-      proba_infection = proba_infection
+      time = t,
+      size = population_size, 
+      n_susceptible = n_susceptibles,
+      prop_susceptible = n_susceptibles/population_size,
+      new_cases = n_new_cases,
+      infection_rate = rate_infection,
+      infection_prob = proba_infection
     )
     stats <- rbind(stats, stats_t)
     
