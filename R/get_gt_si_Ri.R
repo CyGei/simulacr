@@ -36,30 +36,23 @@ get_si <- function(data) {
 #' @export
 #' @examples
 #' data <- data.frame(id = c(1, 2, 3, 4, 5),
-#'                    source = c(NA, 1, 2, 2, 3),
-#'                    group = c("A", "A", "B", "B", "A"))
+#'                   source = c(NA, 1, 2, 2, 3))
 #' get_Ri(data)
 
 get_Ri <- function(data){
   
-  #count the number of times someone appears as a source in each group
-  Ri_mat <- with(data, table(source, group))
-  
-  # ID's total Ri
-  Ri <- rowSums(Ri_mat)
-  Ri_mat <- cbind(Ri_mat, Ri)
-  
+  #count the number of times someone appears as a source 
+  Ri_mat <- as.matrix(table(data$source))
   
   Ri_df <- data.frame(id = row.names(Ri_mat),
-                      Ri_mat,
+                      Ri = Ri_mat,
                       row.names = NULL)
   
   #Merge back to data
-  data <- merge(data, Ri_df, by = "id", all.x = TRUE)
-  #data[names(Ri_df)[-1]] <- Ri_df[match(data$id, Ri_df$id), -1]
-  
+  #data <- merge(data, Ri_df, by = "id", all.x = TRUE)
+  data$Ri <- Ri_df$Ri[match(data$id, Ri_df$id)]  
   # Where Ri is NA replace with 0
-  data[names(Ri_df)[-1]][is.na(data[names(Ri_df)[-1]])] <- 0
+  data["Ri"][is.na(data["Ri"])] <- 0
   
   return(data)
   
