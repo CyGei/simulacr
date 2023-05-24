@@ -17,7 +17,6 @@ This function takes in a data frame with columns for source ID and group, and re
 }
 \examples{
 data <- data.frame(id = c(1, 2, 3, 4, 5),
-                   source = c(NA, 1, 2, 2, 3),
-                   group = c("A", "A", "B", "B", "A"))
+                  source = c(NA, 1, 2, 2, 3))
 get_Ri(data)
 }
