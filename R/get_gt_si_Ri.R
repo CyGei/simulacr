@@ -8,7 +8,7 @@
 #' @export
 get_gt <- function(data) {
   data$gt <- data$date_infection - data$date_infection[match(data$source, data$id)]
-
+  return(data)
 }
 
 
@@ -22,7 +22,7 @@ get_gt <- function(data) {
 #' @export
 get_si <- function(data) {
   data$si <- data$date_onset - data$date_onset[match(data$source, data$id)]
-
+  return(data)
 }
 
 
